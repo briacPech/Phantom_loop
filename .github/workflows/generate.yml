@@ -1,1 +1,33 @@
 
+name: Génération fantôme quotidienne
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Tous les jours à 2h UTC
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cloner le dépôt
+        uses: actions/checkout@v3
+
+      - name: Configurer Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Installer les dépendances
+        run: pip install --upgrade pip
+
+      - name: Exécuter le script
+        run: python generate_markdown.py
+
+      - name: Pousser les modifications
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Fichier généré automatiquement"
+          git push
